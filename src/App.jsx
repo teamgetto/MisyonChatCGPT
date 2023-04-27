@@ -2,8 +2,13 @@ import { useState } from 'react'
 import './App.css'
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, TypingIndicator } from '@chatscope/chat-ui-kit-react';
+import serviceCall from './ServiceCall';
 
 const API_KEY = "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";
+const forbiddenWords = ['Mısyon Yatırım Bankası', 'Misyon Yatirim Bankasi', 'Misyon yatırım bankası', 'Misyon Bank', 'Mısyon Bank'];
+const regex = new RegExp(forbiddenWords.join('|'), 'gi');
+
+
 // "Explain things like you would to a 10 year old learning how to code."
 const systemMessage = { //  Explain things like you're talking to a software professional with 5 years of experience.
   "role": "system", "content": "Explain things like you're talking to a software professional with 2 years of experience."
@@ -20,20 +25,30 @@ function App() {
   const [isTyping, setIsTyping] = useState(false);
 
   const handleSend = async (message) => {
-    const newMessage = {
-      message,
-      direction: 'outgoing',
-      sender: "user"
-    };
+    const matches = message.match(regex);
 
-    const newMessages = [...messages, newMessage];
-    
-    setMessages(newMessages);
+    if (matches !== null) {
+      const mesaj = "Genele açık yapay zeka uygulamalarını kullanırken bankamızın adının ve stratejilerinin hiçbir şekilde kullanılmaması gerekmektedir. Lütfen banka adı yerine \"Ağa123\" rumuzunu kullanınız.";
+      const sonuc = alert(mesaj);
+      console.log(`Yasaklı kelime mevcut: ${matches}`);
+    } else {
+      const newMessage = {
+        message,
+        direction: 'outgoing',
+        sender: "user"
+      };
 
-    // Initial system message to determine ChatGPT functionality
-    // How it responds, how it talks, etc.
-    setIsTyping(true);
-    await processMessageToChatGPT(newMessages);
+      const newMessages = [...messages, newMessage];
+      
+      setMessages(newMessages);
+
+      // Initial system message to determine ChatGPT functionality
+      // How it responds, how it talks, etc.
+      setIsTyping(true);
+      returnmessage = await processMessageToChatGPT(newMessages);
+      console.log(returnmessage);
+      serviceCall(message, 'returnmessage');
+    }     
   };
 
   async function processMessageToChatGPT(chatMessages) { // messages is an array of messages
@@ -81,7 +96,7 @@ function App() {
       }]);
       setIsTyping(false);
     });
-  }
+  }  
 
   return (
     <div className="App">
@@ -97,6 +112,7 @@ function App() {
                 return <Message key={i} model={message} />
               })}
             </MessageList>
+            
             <MessageInput placeholder="Type message here" onSend={handleSend} />        
           </ChatContainer>
         </MainContainer>
