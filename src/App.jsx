@@ -3,7 +3,7 @@ import './App.css'
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, TypingIndicator } from '@chatscope/chat-ui-kit-react';
 
-const API_KEY = "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";
+const API_KEY = "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";
 // "Explain things like you would to a 10 year old learning how to code."
 const systemMessage = { //  Explain things like you're talking to a software professional with 5 years of experience.
   "role": "system", "content": "Explain things like you're talking to a software professional with 2 years of experience."
@@ -12,7 +12,7 @@ const systemMessage = { //  Explain things like you're talking to a software pro
 function App() {
   const [messages, setMessages] = useState([
     {
-      message: "Hello, I'm ChatGPT! Ask me anything!",
+      message: "Merhaba, ben Misyon Chat! \n Seni gördüğüme mutlu oldum, bugün seninle ne yapalım ?",
       sentTime: "just now",
       sender: "ChatGPT"
     }
@@ -90,14 +90,14 @@ function App() {
           <ChatContainer>       
             <MessageList 
               scrollBehavior="smooth" 
-              typingIndicator={isTyping ? <TypingIndicator content="ChatGPT is typing" /> : null}
+              typingIndicator={isTyping ? <TypingIndicator content="Misyon Chat yazıyor" /> : null}
             >
               {messages.map((message, i) => {
                 console.log(message)
                 return <Message key={i} model={message} />
               })}
             </MessageList>
-            <MessageInput placeholder="Type message here" onSend={handleSend} />        
+            <MessageInput placeholder="Mesajınızı buraya yazın" onSend={handleSend} />        
           </ChatContainer>
         </MainContainer>
       </div>
