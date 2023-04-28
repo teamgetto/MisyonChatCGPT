@@ -3,14 +3,19 @@ import './App.css'
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, TypingIndicator } from '@chatscope/chat-ui-kit-react';
 import serviceCall from './ServiceCall';
+import chatMainJS from './ChatMain';
 
-const API_KEY = "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";
+const API_KEY = "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";
+const forbiddenWords = ['Mısyon Yatırım Bankası', 'Misyon Yatirim Bankasi', 'Misyon yatırım bankası', 'Misyon Bank', 'Mısyon Bank'];
+
+const regex = new RegExp(forbiddenWords.join('|'), 'gi');
 // "Explain things like you would to a 10 year old learning how to code."
 const systemMessage = { //  Explain things like you're talking to a software professional with 5 years of experience.
   "role": "system", "content": "Explain things like you're talking to a software professional with 2 years of experience."
 }
 
 function App() {
+  let requestMessage;
   const [messages, setMessages] = useState([
     {
       message: "Merhaba, ben Misyon Chat! \n Seni gördüğüme mutlu oldum, bugün seninle ne yapalım ?",
@@ -22,11 +27,10 @@ function App() {
 
   const handleSend = async (message) => {
     const matches = message.match(regex);
+    requestMessage = message;
 
     if (matches !== null) {
-      const mesaj = "Genele açık yapay zeka uygulamalarını kullanırken bankamızın adının ve stratejilerinin hiçbir şekilde kullanılmaması gerekmektedir. Lütfen banka adı yerine \"Ağa123\" rumuzunu kullanınız.";
-      const sonuc = alert(mesaj);
-      console.log(`Yasaklı kelime mevcut: ${matches}`);
+      chatMainJS(); 
     } else {
       const newMessage = {
         message,
@@ -41,9 +45,7 @@ function App() {
       // Initial system message to determine ChatGPT functionality
       // How it responds, how it talks, etc.
       setIsTyping(true);
-      returnmessage = await processMessageToChatGPT(newMessages);
-      console.log(returnmessage);
-      serviceCall(message, 'returnmessage');
+      await processMessageToChatGPT(newMessages);
     }     
   };
 
@@ -86,6 +88,7 @@ function App() {
       return data.json();
     }).then((data) => {
       console.log(data);
+      serviceCall(requestMessage, data.choices[0].message.content);
       setMessages([...chatMessages, {
         message: data.choices[0].message.content,
         sender: "ChatGPT"
@@ -96,21 +99,38 @@ function App() {
 
   return (
     <div className="App">
-      <div style={{ position:"relative", height: "800px", width: "700px"  }}>
-        <MainContainer>
-          <ChatContainer>       
-            <MessageList 
-              scrollBehavior="smooth" 
-              typingIndicator={isTyping ? <TypingIndicator content="Misyon Chat yazıyor" /> : null}
-            >
-              {messages.map((message, i) => {
-                console.log(message)
-                return <Message key={i} model={message} />
-              })}
-            </MessageList>
-            <MessageInput placeholder="Mesajınızı buraya yazın" onSend={handleSend} />        
-          </ChatContainer>
-        </MainContainer>
+      <div class="row h-auto min-vh-100 bg-dark">
+        <div class="col-3"></div>
+        <div class = "col-6 m-3 p-3">
+          <div style={{ height: "100%", }}>
+            <MainContainer>
+              <ChatContainer>       
+                <MessageList 
+                  scrollBehavior="smooth" 
+                  typingIndicator={isTyping ? <TypingIndicator content="Misyon Chat yazıyor" /> : null}
+                >
+                  {messages.map((message, i) => {
+                    console.log(message)
+                    return <Message key={i} model={message} />
+                  })}
+                </MessageList>
+                <MessageInput placeholder="Mesajınızı buraya yazın" onSend={handleSend} />        
+              </ChatContainer>
+            </MainContainer>
+          </div>
+        </div> 
+      </div>          
+      <div class="modal" id="myModal">
+        <div class="modal-dialog">
+          <div class="modal-content"> 
+            <div class="modal-body">
+              Genele açık yapay zeka uygulamalarını kullanırken bankamızın adının ve stratejilerinin hiçbir şekilde kullanılmaması gerekmektedir. Lütfen banka adı yerine "Ağa123" rumuzunu kullanınız.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Kapat</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
